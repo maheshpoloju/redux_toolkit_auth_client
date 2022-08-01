@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import {useNavigate, Navigate} from 'react-router-dom';
-import {userSelector, loginUser} from '../../features/userSlice';
+import {userSelector, loginUser, clearState} from '../../features/userSlice';
+import { TailSpin } from  'react-loader-spinner'
 import './index.css'
 
 const Login = () => {
@@ -12,7 +13,7 @@ const Login = () => {
 	const { isFetching, isSuccess, isError, errorMessage } = useSelector(
     	userSelector
   	);
-  	// console.log('errorMessage: ', errorMessage)
+
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -20,6 +21,7 @@ const Login = () => {
 
 	const handleChange = ({ currentTarget: input }) => {
 		setData({ ...data, [input.name]: input.value });
+		dispatch(clearState())
 	};
 
 	const handleSubmit = async (e) => {
@@ -31,12 +33,19 @@ const Login = () => {
 		navigate("/register")
 	}
 
+	// useEffect(() => {
+	// 	if(isError){
+	// 		dispatch(clearState())
+	// 	}
+	// }, [isError])
+
 	const token = localStorage.getItem('userToken')
 	// console.log('usetoken', token)
 	if (token !== null){
 		return <Navigate to="/" />
 	}
 	
+
 	return(
 		<div className='login_container'>
 			<form className='form_container' onSubmit={handleSubmit}>
@@ -59,9 +68,13 @@ const Login = () => {
 					required
 					className='input'
 				/>
-				{isError && <div className='error_msg'>{errorMessage}</div>}
+				{isError && (<div className='error_msg'>{errorMessage}</div>)}
 				<button type="submit" className='sign-in-button'>
-					Sign In
+					{isFetching ? 
+						(
+							<TailSpin color="black" height={20} width={30} />
+						): ""
+					} Sign In
 				</button>
 			</form>
 
@@ -70,6 +83,7 @@ const Login = () => {
 			<button onClick={hadnleRegisterButton} type="submit" className='sign-in-button'>
 					Register Here
 			</button>
+
 		</div>
 	)
 }

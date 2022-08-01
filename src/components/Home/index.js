@@ -1,13 +1,19 @@
 import React, { Fragment, useEffect, useState } from 'react';		
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {userSelector} from '../../features/userSlice';
+import {userSelector, getUser, clearState} from '../../features/userSlice';
 import "./index.css"
 
 const Home = () => {
 	const { username } = useSelector(userSelector)
-	console.log('username', username)
+
 	const navigate = useNavigate()
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+    	const jwtToken = localStorage.getItem("userToken")
+    	dispatch(getUser(jwtToken))
+  	}, []);
 
 	const onLogOut = () => {
 		localStorage.removeItem('userToken');

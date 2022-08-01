@@ -1,7 +1,8 @@
 import React, { Fragment, useEffect, useState } from 'react';			
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import {userSelector, signUpUser} from '../../features/userSlice';
+import {userSelector, signUpUser, clearState} from '../../features/userSlice';
+import { TailSpin } from  'react-loader-spinner'
 import "./index.css"
 
 const Signup = () => {
@@ -9,7 +10,7 @@ const Signup = () => {
   const navigate = useNavigate();
   	
 	const { isFetching, isSuccess, isError, errorMessage } = useSelector(userSelector)
-	// console.log(props)
+
 
   const [data, setData] = useState({
     username: "",
@@ -20,21 +21,17 @@ const Signup = () => {
 
   const handleChange = ({ currentTarget: input }) => {
     setData({ ...data, [input.name]: input.value });
+    dispatch(clearState())
   };
 
 	const onSubmit = (e) => {
       e.preventDefault();
     	dispatch(signUpUser(data));
   	};
-  	useEffect(() => {
-	  if (isSuccess) {
-	    // dispatch(clearState())
-	    navigate("/")
-	  }
-	  // if (isError) {
-	  //   dispatch(clearState())
-	  // }
-	}, [isSuccess, isError])
+
+  if(isSuccess){
+    navigate("/")
+  }
 
 
   const token = localStorage.getItem('userToken')
@@ -76,7 +73,11 @@ const Signup = () => {
           />
           {isError && <div className='sign-up-error-message'>{errorMessage}</div>}
           <button type="submit" className='sign-up-button'>
-            Sign Up
+            {isFetching ? 
+            (
+              <TailSpin color="black" height={20} width={30} />
+            ): ""
+          } Sign Up
           </button>
         </form>
     </div>
